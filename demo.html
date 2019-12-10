@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="p5.min.js"></script>
+    <script src="p5.serialport.js"></script>
+    <meta charset="utf-8">
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+  	<style>
+  		#square {
+  			background-color: gray;
+  			width: 200px;
+  			height: 200px;
+  			margin:0 auto;			
+			position:absolute;
+			left:50%;
+			top:50%;
+			margin-left:-100px;
+			margin-top:-100px;
+			font-family: sans-serif;
+			color:white;
+			text-align: center;
+			line-height: 200px;
+  		}
+  	</style>
+  </head>
+  <body>
+  	<!-- Hier würde der eigentliche HTML-Teil hinkommen -->
+  	<div id="square">Trigger LED</div>
+  	<!-- Ab hier Serialport-Demo Javascript-Teil-->
+    <script>
+    	let serial;
+		let portName = 'COM13';    // Serialport-Name muss zu Arduino passen (auf Win: COM3, COM4, etc...)
+		let inData;   //Daten vom Arduino
+
+		function setup() {
+		  //set up communication port
+		  serial = new p5.SerialPort();
+		  serial.on('list', printList);
+		  serial.on('connected', () => { console.log("Connected"); });
+		  serial.on('open',  () => { console.log("Port opened"); });
+		  serial.on('error',  (err) => { console.log("Error:" +err); });
+		  serial.on('close',  () => { console.log("Port closed"); });
+
+		  serial.on('data', serialEvent);     // callback for when new data arrives
+
+		  serial.list();                      // list the serial ports
+		  serial.open(portName);              // open a serial port
+		}
+
+		function serialEvent() {
+		  //Hier werden die Arduino-Daten eingelesen
+		  inData = serial.readLine();
+		  //Jetzt kann etwas mit den Arduino-Daten gemacht werden
+		  //...
+		  console.log(inData);		  
+
+		  //Beispiel:
+		  $("#square").css('transform', 'scale(' + inData + ')');
+		}
+
+		//Portliste ausgeben
+		function printList(portList) {
+		  for (var i = 0; i < portList.length; i++) {
+		 	console.log(i + " " + portList[i]);
+		  }
+		}
+
+		//Bei Klicken Kommando an Arduino senden
+		$("#square").click(function() {
+			//Hier muss ein Kommando mit serial.write hin
+		});		
+    </script>
+  </body>
+</html>
